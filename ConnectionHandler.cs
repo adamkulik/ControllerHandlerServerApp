@@ -1,16 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
-using Android.App;
-using Android.Content;
-using Android.OS;
-using Android.Runtime;
-using Android.Views;
-using Android.Widget;
 
 namespace ControllerHandlerServerApp
 {
@@ -18,13 +8,13 @@ namespace ControllerHandlerServerApp
     {
         private Socket udpSocket;
         private Socket handler;
-        
+
         public int PortNumber { get; set; }
         public ConnectionHandler(int port)
         {
-            new Socket(SocketType.Dgram, ProtocolType.Udp);
+            udpSocket = new Socket(SocketType.Dgram, ProtocolType.Udp);
             PortNumber = port;
-            
+
         }
 
         public void StartServer()
@@ -35,10 +25,10 @@ namespace ControllerHandlerServerApp
             try
             {
                 udpSocket.Bind(localEndPoint);
-                udpSocket.BeginAccept(new AsyncCallback(AcceptConnection),udpSocket);
-            
+                udpSocket.BeginAccept(new AsyncCallback(AcceptConnection), udpSocket);
+
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw; // TODO: implement
             }
