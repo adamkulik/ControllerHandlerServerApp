@@ -38,7 +38,7 @@ namespace ControllerHandlerServerApp
                 udpSocket.BeginAccept(new AsyncCallback(AcceptConnection),udpSocket);
             
             }
-            catch()
+            catch(Exception e)
             {
                 throw; // TODO: implement
             }

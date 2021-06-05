@@ -14,6 +14,7 @@ using Android;
 using Xamarin.Essentials;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Text;
 
 namespace ControllerHandlerServerApp
 {
@@ -23,6 +24,71 @@ namespace ControllerHandlerServerApp
         Button startServerButton;
         ConnectionHandler connectionHandler;
         TextView serverPortText;
+        private static float GetCenteredAxis(MotionEvent e,
+       InputDevice device, Axis axis, int historyPos)
+        {
+            InputDevice.MotionRange range =
+           device.GetMotionRange(axis, e.Source);
+
+            // A joystick at rest does not always report an absolute position of
+            // (0,0). Use the getFlat() method to determine the range of values
+            // bounding the joystick axis center.
+            if (range != null)
+            {
+                float flat = range.Flat;
+                float value =
+                historyPos < 0 ? e.GetAxisValue(axis) :
+                e.GetHistoricalAxisValue(axis, historyPos);
+
+                // Ignore axis values that are within the 'flat' region of the
+                // joystick axis center.
+                if (Math.Abs(value) > flat)
+                {
+                    return value;
+                }
+            }
+            return 0;
+        }
+        public override bool OnGenericMotionEvent(MotionEvent e)
+        {
+            if (connectionHandler != null)
+            {
+                for (int i = 0; i < e.HistorySize; i++)
+                {
+                    ProcessJoystickInput(e, i);
+                }
+                ProcessJoystickInput(e, -1); // process current event as well
+            }
+            return true;
+        }
+
+        private void ProcessJoystickInput(MotionEvent e, int i)
+        {
+            int gasVal = 1500;
+            if (e != null && e.IsFromSource(InputSourceType.Joystick))
+            {
+                if (e.GetAxisValue(Axis.Rtrigger) > 0)
+                {
+                    gasVal = 1500 + Convert.ToInt32(400 * GetCenteredAxis(e, e.Device, Axis.Rtrigger, i));
+                }
+                else if (e.GetAxisValue(Axis.Ltrigger) > 0)
+                {
+                    gasVal = 1500 - Convert.ToInt32(400 * GetCenteredAxis(e, e.Device, Axis.Ltrigger, i));
+                }
+
+
+            }
+
+            if (gasVal < 1100 || gasVal > 1900) gasVal = 1500;
+            int turnVal = 0;
+            if (e != null && e.IsFromSource(InputSourceType.Joystick))
+            {
+                turnVal = 180 - Convert.ToInt32((90 * GetCenteredAxis(e, e.Device, Axis.X, i)) + 90);
+            }
+
+            byte[] data = Encoding.ASCII.GetBytes(gasVal.ToString() + turnVal.ToString());
+            connectionHandler.SendData(data);
+        }
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -43,8 +109,6 @@ namespace ControllerHandlerServerApp
         {
             connectionHandler = new ConnectionHandler(0);
             connectionHandler.StartServer();
-
-
             serverPortText.Text = connectionHandler.PortNumber.ToString();
             
         }
