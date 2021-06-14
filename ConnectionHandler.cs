@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace ControllerHandlerServerApp
 {
@@ -8,36 +10,16 @@ namespace ControllerHandlerServerApp
     {
         private Socket udpSocket;
         private Socket handler;
+        private IPAddress address;
+        private bool connected = false;
 
         public int PortNumber { get; set; }
-        public ConnectionHandler(int port)
+        public ConnectionHandler(string ipAddress, int port)
         {
             udpSocket = new Socket(SocketType.Dgram, ProtocolType.Udp);
+            address = new IPAddress(ipAddress.Split('.').Select(x => Byte.Parse(x)).ToArray());
             PortNumber = port;
 
-        }
-
-        public void StartServer()
-        {
-            IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-            IPAddress ipAddress = ipHostInfo.AddressList[0];
-            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, PortNumber);
-            try
-            {
-                udpSocket.Bind(localEndPoint);
-                udpSocket.BeginAccept(new AsyncCallback(AcceptConnection), udpSocket);
-
-            }
-            catch (Exception e)
-            {
-                throw; // TODO: implement
-            }
-        }
-
-        private void AcceptConnection(IAsyncResult ar)
-        {
-            Socket listener = (Socket)ar.AsyncState;
-            handler = listener.EndAccept(ar);
         }
 
         public void StopServer()
@@ -49,12 +31,8 @@ namespace ControllerHandlerServerApp
         }
         public void SendData(byte[] data)
         {
-            handler.BeginSend(data, 0, data.Length, 0, new AsyncCallback(EndSend), handler);
+            udpSocket.SendTo(data, new IPEndPoint(address, PortNumber));
         }
 
-        private void EndSend(IAsyncResult ar)
-        {
-            handler.EndSend(ar);
-        }
     }
 }

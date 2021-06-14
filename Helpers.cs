@@ -61,6 +61,8 @@ namespace ControllerHandlerServerApp
             {
                 turnVal = 180 - Convert.ToInt32((90 * GetCenteredAxis(e, e.Device, Axis.X, historyIndex)) + 90);
             }
+            return turnVal;
 
         }
     }
+}

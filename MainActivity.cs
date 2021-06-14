@@ -16,6 +16,7 @@ namespace ControllerHandlerServerApp
         Button startServerButton;
         ConnectionHandler connectionHandler;
         TextView serverPortText;
+        EditText connectToIpText;
 
         public override bool OnGenericMotionEvent(MotionEvent e)
         {
@@ -51,12 +52,14 @@ namespace ControllerHandlerServerApp
             startServerButton = FindViewById<Button>(Resource.Id.startServerButton);
             startServerButton.Click += StartServerButton_Click;
             serverPortText = FindViewById<TextView>(Resource.Id.serverPortText);
+            connectToIpText = FindViewById<EditText>(Resource.Id.connectToIpText);
         }
 
         private void StartServerButton_Click(object sender, EventArgs e)
         {
-            connectionHandler = new ConnectionHandler(0);
-            connectionHandler.StartServer();
+            string ipString = connectToIpText.Text.Split(':')[0];
+            string portString = connectToIpText.Text.Split(':')[1];
+            connectionHandler = new ConnectionHandler(ipString,Int32.Parse(portString));
             serverPortText.Text = connectionHandler.PortNumber.ToString();
 
         }
