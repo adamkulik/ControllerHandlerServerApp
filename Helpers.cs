@@ -6,9 +6,9 @@ namespace ControllerHandlerServerApp
     public static class Helpers
     {
         public const int GAS_MIDDLE_VALUE = 1500; // number representing "0", eg. no input
-        public const int GAS_RANGE = 400; // absolute difference between max/min value and middle value
+        public const int GAS_RANGE = 200; // absolute difference between max/min value and middle value
         public const int TURN_MIDDLE_VALUE = 90;
-        public const int TURN_RANGE = 90;
+        public const int TURN_RANGE = 75;
         private static float GetCenteredAxis(MotionEvent e,
         InputDevice device, Axis axis, int historyPos)
         {
@@ -56,10 +56,10 @@ namespace ControllerHandlerServerApp
 
         public static int GetTurnValue(MotionEvent e, int historyIndex)
         {
-            int turnVal = 0;
+            int turnVal = Helpers.TURN_MIDDLE_VALUE;
             if (e != null && e.IsFromSource(InputSourceType.Joystick))
             {
-                turnVal = 180 - Convert.ToInt32((90 * GetCenteredAxis(e, e.Device, Axis.X, historyIndex)) + 90);
+                turnVal =  TURN_MIDDLE_VALUE + Convert.ToInt32(Helpers.TURN_RANGE * GetCenteredAxis(e, e.Device, Axis.X, historyIndex));
             }
             return turnVal;
 

@@ -18,6 +18,11 @@
         android:layout_below="@+id/startServerButton"
         android:hint="Enter IP address"
         android:id="@+id/connectToIpText"/>
+    <ImageView
+        android:layout_width="640px"
+        android:layout_height="480px"
+        android:layout_below="@id/connectToIpText"
+        android:id="@+id/videoPreviewSurface"/>
 
 
     <TextView
@@ -25,7 +30,8 @@
         android:layout_height="wrap_content"
         android:text="Server port:"
         android:id="@+id/serverPortText"
-        android:layout_below="@+id/connectToIpText"
+        android:layout_below="@+id/videoPreviewSurface"
         />
+
 
 </RelativeLayout>

@@ -3796,16 +3796,19 @@ namespace ControllerHandlerServerApp
 			public const int useLogo = 2131230911;
 			
 			// aapt resource value: 0x7F0800C0
-			public const int view_offset_helper = 2131230912;
+			public const int videoPreviewSurface = 2131230912;
 			
 			// aapt resource value: 0x7F0800C1
-			public const int visible = 2131230913;
+			public const int view_offset_helper = 2131230913;
 			
 			// aapt resource value: 0x7F0800C2
-			public const int withText = 2131230914;
+			public const int visible = 2131230914;
 			
 			// aapt resource value: 0x7F0800C3
-			public const int wrap_content = 2131230915;
+			public const int withText = 2131230915;
+			
+			// aapt resource value: 0x7F0800C4
+			public const int wrap_content = 2131230916;
 			
 			static Id()
 			{
