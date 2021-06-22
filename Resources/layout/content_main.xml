@@ -32,6 +32,20 @@
         android:id="@+id/serverPortText"
         android:layout_below="@+id/videoPreviewSurface"
         />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Gas value:"
+        android:id="@+id/GasValText"
+        android:layout_below="@+id/serverPortText"
+        />
+     <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Gas value:"
+        android:id="@+id/TurnValText"
+        android:layout_below="@+id/GasValText"
+        />
 
 
 </RelativeLayout>

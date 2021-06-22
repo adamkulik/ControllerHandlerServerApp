@@ -31,6 +31,8 @@ namespace ControllerHandlerServerApp
         private bool connected = false;
         private VideoFrameReceiver receiver;
         private byte[] frame;
+        TextView gasValText;
+        TextView turnValText;
 
         public override bool OnGenericMotionEvent(MotionEvent e)
         {
@@ -52,6 +54,31 @@ namespace ControllerHandlerServerApp
             byte[] data = Encoding.ASCII.GetBytes(gasVal.ToString() + turnVal.ToString());
             connectionHandler.SendData(data);
         }
+        public override bool OnKeyDown([GeneratedEnum] Keycode keyCode, KeyEvent e)
+        {
+            if(e.IsFromSource(InputSourceType.Gamepad))
+            {
+                if(keyCode == Keycode.ButtonL1)
+                {
+                    Helpers.DecreaseGasValue();
+                }
+                else if(keyCode == Keycode.ButtonR1)
+                {
+                    Helpers.IncreaseGasValue();
+                }
+                else if(keyCode == Keycode.ButtonX)
+                {
+                    Helpers.DecreaseTurnValue();
+                }
+                else if(keyCode == Keycode.ButtonB)
+                {
+                    Helpers.IncreaseTurnValue();
+                }
+            }
+            gasValText.Text = "Gas value: " + Helpers.GetCurrentGasValue().ToString();
+            turnValText.Text = "Turn value: " + Helpers.GetCurrentTurnValue().ToString();
+            return base.OnKeyUp(keyCode, e);
+        }
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -68,7 +95,9 @@ namespace ControllerHandlerServerApp
             serverPortText = FindViewById<TextView>(Resource.Id.serverPortText);
             connectToIpText = FindViewById<EditText>(Resource.Id.connectToIpText);
             videoPreviewSurface = FindViewById<ImageView>(Resource.Id.videoPreviewSurface);
-            receiver = new VideoFrameReceiver(true);
+            gasValText = FindViewById<TextView>(Resource.Id.GasValText);
+            turnValText = FindViewById<TextView>(Resource.Id.TurnValText);
+            receiver = new VideoFrameReceiver(false);
             receiver.SetFrame += Receiver_SetFrame;
             receiveFrameTimer = new Timer();
             receiveFrameTimer.Interval = 4.0;
@@ -129,6 +158,9 @@ namespace ControllerHandlerServerApp
         private void StartServerButton_Click(object sender, EventArgs e)
         {
             serverPortText.Text += "Port: " + receiver.Port.ToString();
+            string ipString = connectToIpText.Text.Split(':')[0];
+            string portString = connectToIpText.Text.Split(':')[1];
+            connectionHandler = new ConnectionHandler(ipString, Int32.Parse(portString));
             connected = true;
         }
 

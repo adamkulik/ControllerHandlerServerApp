@@ -25,7 +25,7 @@ namespace ControllerHandlerServerApp
         int[] framePacketsCount;
         private int lastPushedFrame;
         private const int FRAME_THRESHOLD = 50;
-        private const int MTU = 1500;
+        private const int MTU = 1300;
         public event EventHandler SetFrame;
         public byte[] pushedFrame { get; private set; }
 
@@ -37,7 +37,7 @@ namespace ControllerHandlerServerApp
             {
                 receiveDataTimer = new Timer();
                 receiveDataTimer.Elapsed += ReceiveDataTimer_Elapsed;
-                receiveDataTimer.Interval = 1.0;
+                receiveDataTimer.Interval = 0.5;
                 receiveDataTimer.AutoReset = true;
                 receiveDataTimer.Start();
             }
@@ -69,8 +69,12 @@ namespace ControllerHandlerServerApp
             //frame packet: frame number, packet number, packet data
             if (dataBuffer.Take(4).SequenceEqual(counterHeader))
             {
-                if(dataBuffer[5] == 0)
-                assembledFrames[dataBuffer[4]] = new byte[1][];
+                if (dataBuffer[5] == 0)
+                {
+                    assembledFrames[dataBuffer[4]] = new byte[1][];
+                    assembledFrames[dataBuffer[4]][0] = new byte[MTU];
+                }
+                assembledFrames[dataBuffer[4]] = new byte[dataBuffer[5]][];
                 for(int i = 0; i<dataBuffer[5]; i++)
                 {
                     assembledFrames[dataBuffer[4]][i] = new byte[MTU];
@@ -78,8 +82,8 @@ namespace ControllerHandlerServerApp
             }
             else
             {
-              if(framePacketsCount[dataBuffer[0]] > 0)
-                assembledFrames[dataBuffer[0]][dataBuffer[1]] = dataBuffer.TakeLast(dataBuffer.Count() - 2).ToArray();
+              if(assembledFrames[dataBuffer[0]] != null && assembledFrames[dataBuffer[0]][dataBuffer[1]] != null && framePacketsCount[dataBuffer[0]] > 0)
+                assembledFrames[dataBuffer[0]][dataBuffer[1]] = dataBuffer.TakeLast(dataBuffer.Count() - 2).OrderBy(x => x == 0).ToArray();
             }
             framePacketsCount[dataBuffer[0]]++;
             if(assembledFrames[dataBuffer[0]] != null && framePacketsCount[dataBuffer[0]] == assembledFrames[dataBuffer[0]].Count() + 1)
